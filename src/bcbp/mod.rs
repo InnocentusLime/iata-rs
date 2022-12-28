@@ -1,7 +1,15 @@
 use std::str;
 use std::u32;
 
-use time::Date;
+pub use chrono::{
+    Offset,
+    TimeZone,
+    NaiveDate,
+};
+
+use chrono::{Datelike};
+
+
 
 mod error;
 pub mod field;
@@ -134,7 +142,7 @@ impl Leg {
         self.flight_day.as_ref()
     }
 
-    pub fn set_flight_date(&mut self, date: Date) -> std::result::Result<(), DateError> {
+    pub fn set_flight_date(&mut self, date: NaiveDate) -> std::result::Result<(), DateError> {
         self.flight_day = Some(DayOfYear::new(date.ordinal())?);
 
         Ok(())
@@ -312,7 +320,7 @@ impl Bcbp {
 
             let flight_day = chunk.fetch_str(Field::DateOfFlight)?;
             leg.flight_day = if !flight_day.trim().is_empty() {
-                Some(DayOfYear::new(u16_from_str_force(flight_day, 10)).unwrap())
+                Some(DayOfYear::new(u16_from_str_force(flight_day, 10) as u32).unwrap())
             } else {
                 None
             };
